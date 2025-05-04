@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eddie's Darkroom</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: white;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    .landing {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+      transition: opacity 1s ease;
+    }
+    .enter-button {
+      background: none;
+      border: 2px solid white;
+      color: white;
+      padding: 1em 2em;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+    .enter-button:hover {
+      background: white;
+      color: black;
+    }
+    .darkroom {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: start;
+      padding-top: 60px;
+      z-index: 1;
+    }
+    .string {
+      width: 90%;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      position: relative;
+      animation: dropIn 1s ease-out forwards;
+      transform: translateY(-200px);
+      opacity: 0;
+    }
+    .string-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #555;
+      z-index: 0;
+    }
+    .photo-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .clothespin {
+      width: 10px;
+      height: 20px;
+      background: #a0522d;
+      border-radius: 2px;
+      margin-bottom: 5px;
+    }
+    .photo-card {
+      width: 100px;
+      height: 130px;
+      background: white;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+      cursor: pointer;
+      transition: box-shadow 0.3s ease, transform 1s ease;
+      z-index: 1;
+    }
+    .photo-card:hover {
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    }
+    .photo-card.fallen {
+      transform: translateY(400px) rotate(10deg);
+    }
+    .reveal {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3;
+      display: none;
+      flex-direction: column;
+    }
+    .reveal img {
+      max-width: 80vw;
+      max-height: 80vh;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .ripple {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 60%);
+      animation: rippleAnim 1s ease-out forwards;
+      pointer-events: none;
+      z-index: 2;
+    }
+    @keyframes dropIn {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+    @keyframes rippleAnim {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="landing" id="landing">
+    <button class="enter-button" onclick="enterDarkroom()">Enter the Darkroom</button>
+  </div>
+
+  <div class="darkroom" id="darkroom">
+    <div class="string">
+      <div class="string-line"></div>
+      <div class="photo-wrapper">
+        <div class="clothespin"></div>
+        <div class="photo-card" onclick="developPhoto(this, 'https://via.placeholder.com/500x650')"></div>
+      </div>
+      <div class="photo-wrapper">
+        <div class="clothespin"></div>
+        <div class="photo-card" onclick="developPhoto(this, 'https://via.placeholder.com/500x650')"></div>
+      </div>
+      <div class="photo-wrapper">
+        <div class="clothespin"></div>
+        <div class="photo-card" onclick="developPhoto(this, 'https://via.placeholder.com/500x650')"></div>
+      </div>
+      <div class="photo-wrapper">
+        <div class="clothespin"></div>
+        <div class="photo-card" onclick="developPhoto(this, 'https://via.placeholder.com/500x650')"></div>
+      </div>
+      <div class="photo-wrapper">
+        <div class="clothespin"></div>
+        <div class="photo-card" onclick="developPhoto(this, 'https://via.placeholder.com/500x650')"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" id="reveal">
+    <button class="close-btn" onclick="closeReveal()">&times;</button>
+    <img id="reveal-img" src="" alt="Revealed Photo">
+  </div>
+
+  <script>
+    function enterDarkroom() {
+      document.getElementById("landing").style.opacity = 0;
+      setTimeout(() => {
+        document.getElementById("landing").style.display = "none";
+        document.getElementById("darkroom").style.display = "flex";
+      }, 1000);
+    }
+
+    function developPhoto(card, imgUrl) {
+      card.classList.add("fallen");
+      const ripple = document.createElement("div");
+      ripple.className = "ripple";
+      document.body.appendChild(ripple);
+      setTimeout(() => {
+        ripple.remove();
+        document.getElementById("reveal-img").src = imgUrl;
+        document.getElementById("reveal").style.display = "flex";
+      }, 1000);
+    }
+
+    function closeReveal() {
+      document.getElementById("reveal").style.display = "none";
+    }
+  </script>
+</body>
+</html>
