@@ -1,1 +1,121 @@
-<!-- Your admin.html content should go here -->
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Admin Photo Uploader</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 2em;
+    }
+    label, input, button {
+      display: block;
+      margin: 1em 0;
+      font-size: 1rem;
+    }
+    input[type='text'], input[type='file'] {
+      width: 100%;
+      padding: 0.5em;
+      background: #222;
+      color: #fff;
+      border: 1px solid #444;
+    }
+    button {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 0.5em 1em;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 1em 0;
+    }
+    img {
+      max-width: 100px;
+      border: 2px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin: Add Photo</h1>
+  <label for='urlInput'>Image URL (GitHub or Imgur)</label>
+  <input type='text' id='urlInput' placeholder='https://your-image-url.jpg'>
+  <button onclick='addPhoto()'>Add Photo</button>
+
+  <label for='imgUpload'>Or upload an image (auto uploads to Imgur)</label>
+  <input type='file' id='imgUpload' accept='image/*'>
+
+  <h2>Preview:</h2>
+  <ul id='photoList'></ul>
+
+  <script>
+    const photoList = document.getElementById('photoList');
+    const urlInput = document.getElementById('urlInput');
+    const imgUpload = document.getElementById('imgUpload');
+
+    function addPhoto(url) {
+      url = url || urlInput.value.trim();
+      if (!url) return;
+
+      const stored = JSON.parse(localStorage.getItem('photos') || '[]');
+      if (!stored.includes(url)) {
+        stored.push(url);
+        localStorage.setItem('photos', JSON.stringify(stored));
+
+        const li = document.createElement('li');
+        const img = document.createElement('img');
+        img.src = url;
+        li.appendChild(img);
+        photoList.appendChild(li);
+      }
+
+      urlInput.value = '';
+    }
+
+    imgUpload.addEventListener('change', async () => {
+      const file = imgUpload.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('https://api.imgur.com/3/image', {
+        method: 'POST',
+        headers: {
+          Authorization: 'Client-ID 2c3b29cb32ed83a'
+        },
+        body: formData
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        addPhoto(result.data.link);
+      } else {
+        alert('Upload failed. Try a smaller image.');
+      }
+
+      imgUpload.value = '';
+    });
+
+    window.onload = () => {
+      const stored = JSON.parse(localStorage.getItem('photos') || '[]');
+      stored.forEach(url => {
+        const li = document.createElement('li');
+        const img = document.createElement('img');
+        img.src = url;
+        li.appendChild(img);
+        photoList.appendChild(li);
+      });
+
+      sessionStorage.setItem('latestPhotos', JSON.stringify(stored.slice(-5)));
+    };
+  </script>
+</body>
+</html>
