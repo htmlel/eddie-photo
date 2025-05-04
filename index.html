@@ -1,10 +1,68 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Eddie Cisneros - Darkroom</title>
-  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBS9D1LNFZqQa-I0GLj0jkK4rsfzhaZWp8",
+      authDomain: "eddie-darkroom.firebaseapp.com",
+      projectId: "eddie-darkroom",
+      storageBucket: "eddie-darkroom.firebasestorage.app",
+      messagingSenderId: "636863116260",
+      appId: "1:636863116260:web:4f393bde196d16d22bcdf1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadPhotos() {
+      const photoCol = collection(db, "photos");
+      const photoSnap = await getDocs(photoCol);
+      const stringDiv = document.getElementById("string");
+      stringDiv.innerHTML = '<div class="string-line"></div>';
+
+      photoSnap.forEach(doc => {
+        const url = doc.data().url;
+        const wrapper = document.createElement("div");
+        wrapper.className = "photo-wrapper";
+
+        const pin = document.createElement("div");
+        pin.className = "clothespin";
+
+        const card = document.createElement("div");
+        card.className = "photo-card";
+        card.onclick = () => developPhoto(card, url);
+
+        wrapper.appendChild(pin);
+        wrapper.appendChild(card);
+        stringDiv.appendChild(wrapper);
+      });
+    }
+
+    window.onload = loadPhotos;
+    window.developPhoto = function(card, url) {
+      card.classList.add("fallen");
+      document.getElementById("reveal-img").src = url;
+      document.getElementById("reveal").style.display = "flex";
+    }
+    window.closeReveal = function() {
+      document.getElementById("reveal").style.display = "none";
+    }
+    window.accessAdmin = function() {
+      const pass = prompt("Enter admin password:");
+      if (pass === "darkroom123") {
+        window.location.href = "admin.html";
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+  </script>
   <style>
     body {
       margin: 0;
@@ -42,7 +100,7 @@
       text-decoration: none;
     }
     .darkroom {
-      display: none;
+      display: flex;
       position: absolute;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
@@ -113,65 +171,17 @@
 </head>
 <body>
   <div class="landing" id="landing">
-    <button class="enter-button" onclick="enterDarkroom()">Enter the Darkroom</button>
+    <button class="enter-button" onclick="location.reload()">Enter the Darkroom</button>
     <a href="#" onclick="accessAdmin()" class="admin-link">Admin</a>
   </div>
-
-  <div class="darkroom" id="darkroom">
+  <div class="darkroom">
     <div class="string" id="string">
       <div class="string-line"></div>
     </div>
   </div>
-
   <div class="reveal" id="reveal">
     <button class="close-btn" onclick="closeReveal()">&times;</button>
     <img id="reveal-img" src="" alt="Revealed">
   </div>
-
-  <script>
-    function enterDarkroom() {
-      document.getElementById("landing").style.display = "none";
-      document.getElementById("darkroom").style.display = "flex";
-
-      const photos = JSON.parse(sessionStorage.getItem("latestPhotos") || "[]");
-      const stringDiv = document.getElementById("string");
-      stringDiv.innerHTML = '<div class="string-line"></div>';
-
-      photos.forEach(url => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "photo-wrapper";
-
-        const pin = document.createElement("div");
-        pin.className = "clothespin";
-
-        const card = document.createElement("div");
-        card.className = "photo-card";
-        card.onclick = () => developPhoto(card, url);
-
-        wrapper.appendChild(pin);
-        wrapper.appendChild(card);
-        stringDiv.appendChild(wrapper);
-      });
-    }
-
-    function developPhoto(card, url) {
-      card.classList.add("fallen");
-      document.getElementById("reveal-img").src = url;
-      document.getElementById("reveal").style.display = "flex";
-    }
-
-    function closeReveal() {
-      document.getElementById("reveal").style.display = "none";
-    }
-
-    function accessAdmin() {
-      const pass = prompt("Enter admin password:");
-      if (pass === "darkroom123") {
-        window.location.href = "admin.html";
-      } else {
-        alert("Incorrect password.");
-      }
-    }
-  </script>
 </body>
 </html>
