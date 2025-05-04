@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin - Eddie's Darkroom</title>
+  <title>Darkroom Admin</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
@@ -19,103 +19,82 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const photosRef = collection(db, "photos");
+    const photoCol = collection(db, "photos");
 
-    async function uploadToImgur(file) {
-      const formData = new FormData();
-      formData.append("image", file);
-      const res = await fetch("https://api.imgur.com/3/image", {
-        method: "POST",
-        headers: {
-          Authorization: "Client-ID 2c3b29cb32ed83a",
-        },
-        body: formData,
-      });
-      const data = await res.json();
-      return data.data.link;
-    }
+    document.getElementById("addBtn").onclick = async () => {
+      const url = document.getElementById("photoUrl").value.trim();
+      if (!url) return alert("Enter a photo URL.");
 
-    async function addPhoto(url) {
-      await addDoc(photosRef, { url });
+      await addDoc(photoCol, { url });
+      document.getElementById("photoUrl").value = "";
       loadPhotos();
-    }
-
-    async function removePhoto(id) {
-      await deleteDoc(doc(db, "photos", id));
-      loadPhotos();
-    }
+    };
 
     async function loadPhotos() {
-      const list = document.getElementById("photoList");
-      list.innerHTML = "";
-      const snap = await getDocs(photosRef);
+      const container = document.getElementById("gallery");
+      container.innerHTML = "";
+      const snap = await getDocs(photoCol);
       snap.forEach(docSnap => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <img src="${docSnap.data().url}" width="100" />
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "photo-block";
+        div.innerHTML = `
+          <img src="${data.url}" />
           <button onclick="removePhoto('${docSnap.id}')">Remove</button>
         `;
-        list.appendChild(li);
+        container.appendChild(div);
       });
     }
 
-    window.addPhotoURL = () => {
-      const url = document.getElementById("urlInput").value;
-      if (url) addPhoto(url);
-      document.getElementById("urlInput").value = "";
-    };
-
-    window.removePhoto = removePhoto;
-
-    window.onload = () => {
+    window.removePhoto = async function (id) {
+      await deleteDoc(doc(db, "photos", id));
       loadPhotos();
-      document.getElementById("imgUpload").addEventListener("change", async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const url = await uploadToImgur(file);
-          addPhoto(url);
-        }
-      });
     };
+
+    loadPhotos();
   </script>
   <style>
     body {
+      font-family: sans-serif;
       background: #111;
       color: white;
-      font-family: sans-serif;
-      padding: 2em;
+      padding: 30px;
     }
-    input, button {
-      padding: 0.5em;
-      margin-top: 0.5em;
+    h1 {
+      color: #fefefe;
+    }
+    input {
+      width: 300px;
+      padding: 8px;
+      font-size: 1em;
     }
     button {
-      background: #333;
-      border: none;
-      color: white;
+      padding: 8px 14px;
+      font-size: 1em;
+      margin-left: 10px;
       cursor: pointer;
     }
-    ul {
-      list-style: none;
-      padding: 0;
+    .photo-block {
+      display: inline-block;
+      margin: 10px;
+      text-align: center;
     }
-    li {
-      margin: 1em 0;
-    }
-    img {
+    .photo-block img {
+      max-width: 150px;
+      height: auto;
       display: block;
-      margin-bottom: 0.5em;
-      border: 2px solid #444;
+      margin-bottom: 5px;
+    }
+    #gallery {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Admin Panel</h1>
-  <input type="text" id="urlInput" placeholder="Paste Imgur URL" />
-  <button onclick="addPhotoURL()">Add Photo</button>
-  <br/><br/>
-  <input type="file" id="imgUpload" />
-  <h2>Gallery</h2>
-  <ul id="photoList"></ul>
+  <h1>Admin - Add Photo</h1>
+  <input type="text" id="photoUrl" placeholder="Paste image URL here..." />
+  <button id="addBtn">Save</button>
+
+  <div id="gallery"></div>
 </body>
 </html>
