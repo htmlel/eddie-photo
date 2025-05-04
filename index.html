@@ -109,20 +109,30 @@
     }
 
     .light-switch {
-      position: fixed;
-      left: 30px;
-      top: 30px;
-      width: 80px;
-      height: 140px;
-      cursor: pointer;
-      z-index: 10;
-    }
+  position: fixed;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 140px;
+  cursor: pointer;
+  z-index: 10;
+}
 
-    .light-switch img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+.light-switch img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .light-switch {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
 
     .string {
       width: 100vw;
