@@ -23,7 +23,7 @@
       const photoCol = collection(db, "photos");
       const photoSnap = await getDocs(photoCol);
       const stringDiv = document.getElementById("string");
-      stringDiv.innerHTML = '<div class="string-line"></div>';
+      stringDiv.innerHTML = '';
 
       photoSnap.forEach(doc => {
         const url = doc.data().url;
@@ -45,15 +45,29 @@
 
     window.onload = loadPhotos;
 
-    window.enterDarkroom = function () {
-      const switchImg = document.getElementById("switchImg");
-      switchImg.src = "images/darkmode_switch.png";
+    
+window.enterDarkroom = function () {
+  const switchImg = document.getElementById("switchImg");
+  const landing = document.getElementById("landing");
+  const darkroom = document.querySelector(".darkroom");
 
-      const landing = document.getElementById("landing");
-      landing.style.display = "none";
+  const isDarkroomVisible = darkroom.style.display === "flex";
 
-      document.querySelector(".darkroom").style.display = "flex";
-    };
+  if (isDarkroomVisible) {
+    // Switch back to light mode
+    switchImg.src = "images/lightmode_switch.png";
+    document.body.style.backgroundColor = "#e6e0d4";
+    darkroom.style.display = "none";
+    landing.style.display = "flex";
+  } else {
+    // Switch to darkroom
+    switchImg.src = "images/darkmode_switch.png";
+  document.body.style.backgroundColor = "#0b0b0b";
+    landing.style.display = "none";
+    darkroom.style.display = "flex";
+  }
+};
+
 
     window.developPhoto = function(card, url) {
       card.classList.add("fallen");
@@ -84,7 +98,7 @@
     }
 
     .landing {
-      background: white;
+      background: #e6e0d4;
       color: black;
       width: 100vw;
       height: 100vh;
@@ -223,7 +237,7 @@
 
   <div class="darkroom">
     <div class="string" id="string">
-      <div class="string-line"></div>
+      
     </div>
   </div>
 
