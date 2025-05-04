@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Eddie Cisneros - Darkroom</title>
   <script type="module">
-    function enterDarkroom() {
-      document.querySelector(".landing").style.display = "none";
-      document.querySelector(".darkroom").style.display = "flex";
-    }
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
@@ -50,14 +45,25 @@
     }
 
     window.onload = loadPhotos;
+
+    window.enterDarkroom = function () {
+      document.querySelector(".light-switch").classList.add("clicked");
+      setTimeout(() => {
+        document.querySelector(".landing").style.display = "none";
+        document.querySelector(".darkroom").style.display = "flex";
+      }, 1000);
+    };
+
     window.developPhoto = function(card, url) {
       card.classList.add("fallen");
       document.getElementById("reveal-img").src = url;
       document.getElementById("reveal").style.display = "flex";
-    }
+    };
+
     window.closeReveal = function() {
       document.getElementById("reveal").style.display = "none";
-    }
+    };
+
     window.accessAdmin = function() {
       const pass = prompt("Enter admin password:");
       if (pass === "darkroom123") {
@@ -65,7 +71,7 @@
       } else {
         alert("Incorrect password.");
       }
-    }
+    };
   </script>
   <style>
     body {
@@ -75,36 +81,30 @@
       overflow: hidden;
       font-family: sans-serif;
     }
+
     .landing {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      background: white !important;
+      color: black !important;
+      width: 100vw;
+      height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       flex-direction: column;
-      background: black;
+      transition: opacity 1s ease-out;
       z-index: 2;
-    }
-    .enter-button {
-      background: none;
-      border: 1px solid white;
-      color: white;
-      padding: 1em 2em;
-      cursor: pointer;
-      font-size: 1.2em;
-    }
-    .admin-link {
       position: absolute;
-      bottom: 10px;
-      right: 10px;
-      font-size: 0.9em;
-      opacity: 0.4;
-      color: white;
-      text-decoration: none;
+      top: 0;
+      left: 0;
     }
+
+    .landing.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
     .darkroom {
-      display: flex;
+      display: none;
       position: absolute;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
@@ -112,14 +112,15 @@
       align-items: start;
       padding-top: 60px;
     }
+
     .string {
       width: 100vw;
       display: flex;
       justify-content: space-around;
       align-items: flex-start;
       position: relative;
-      opacity: 1;
     }
+
     .string-line {
       position: absolute;
       top: 0;
@@ -129,24 +130,28 @@
       background: #555;
       z-index: 0;
     }
+
     .photo-wrapper {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     .clothespin {
       width: 10px;
       height: 20px;
       background: #a0522d;
       margin-bottom: 5px;
     }
+
     .photo-card {
       width: 100px;
       height: 130px;
       background: white;
       cursor: pointer;
     }
+
     .reveal {
       display: none;
       position: absolute;
@@ -157,10 +162,12 @@
       align-items: center;
       z-index: 3;
     }
+
     .reveal img {
       max-width: 90vw;
       max-height: 90vh;
     }
+
     .close-btn {
       position: absolute;
       top: 20px;
@@ -171,18 +178,71 @@
       border: none;
       cursor: pointer;
     }
+
+    .admin-link {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: #444;
+      font-size: 0.85em;
+      text-decoration: none;
+      opacity: 0.6;
+      z-index: 5;
+    }
+
+    .light-switch {
+      width: 100px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .switch-plate {
+      width: 80px;
+      height: 140px;
+      background: #eee;
+      border: 2px solid #bbb;
+      border-radius: 8px;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.2), inset 0 0 6px rgba(0,0,0,0.1);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .switch-toggle {
+      width: 24px;
+      height: 40px;
+      background: #ccc;
+      border: 2px solid #888;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      transform: translateY(0);
+    }
+
+    .light-switch.clicked .switch-toggle {
+      transform: translateY(40px);
+    }
   </style>
 </head>
 <body>
-  <div class="landing" id="landing">
-    <button class="enter-button" onclick="enterDarkroom()">Enter the Darkroom</button>
-    <a href="#" onclick="accessAdmin()" class="admin-link">Admin</a>
+  <div class="landing fadeout" id="landing">
+    <div class="light-switch" onclick="enterDarkroom()">
+      <div class="switch-plate">
+        <div class="switch-toggle" id="switchToggle"></div>
+      </div>
+    </div>
+    <a href="#" onclick="accessAdmin()" class="admin-link" id="adminLink">Admin</a>
   </div>
+
   <div class="darkroom">
     <div class="string" id="string">
       <div class="string-line"></div>
     </div>
   </div>
+
   <div class="reveal" id="reveal">
     <button class="close-btn" onclick="closeReveal()">&times;</button>
     <img id="reveal-img" src="" alt="Revealed">
