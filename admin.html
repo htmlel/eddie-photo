@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Eddie's Darkroom</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBS9D1LNFZqQa-I0GLj0jkK4rsfzhaZWp8",
+      authDomain: "eddie-darkroom.firebaseapp.com",
+      projectId: "eddie-darkroom",
+      storageBucket: "eddie-darkroom.firebasestorage.app",
+      messagingSenderId: "636863116260",
+      appId: "1:636863116260:web:4f393bde196d16d22bcdf1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const photosRef = collection(db, "photos");
+
+    async function uploadToImgur(file) {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("https://api.imgur.com/3/image", {
+        method: "POST",
+        headers: {
+          Authorization: "Client-ID 2c3b29cb32ed83a",
+        },
+        body: formData,
+      });
+      const data = await res.json();
+      return data.data.link;
+    }
+
+    async function addPhoto(url) {
+      await addDoc(photosRef, { url });
+      loadPhotos();
+    }
+
+    async function removePhoto(id) {
+      await deleteDoc(doc(db, "photos", id));
+      loadPhotos();
+    }
+
+    async function loadPhotos() {
+      const list = document.getElementById("photoList");
+      list.innerHTML = "";
+      const snap = await getDocs(photosRef);
+      snap.forEach(docSnap => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <img src="${docSnap.data().url}" width="100" />
+          <button onclick="removePhoto('${docSnap.id}')">Remove</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    window.addPhotoURL = () => {
+      const url = document.getElementById("urlInput").value;
+      if (url) addPhoto(url);
+      document.getElementById("urlInput").value = "";
+    };
+
+    window.removePhoto = removePhoto;
+
+    window.onload = () => {
+      loadPhotos();
+      document.getElementById("imgUpload").addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const url = await uploadToImgur(file);
+          addPhoto(url);
+        }
+      });
+    };
+  </script>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      padding: 2em;
+    }
+    input, button {
+      padding: 0.5em;
+      margin-top: 0.5em;
+    }
+    button {
+      background: #333;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 1em 0;
+    }
+    img {
+      display: block;
+      margin-bottom: 0.5em;
+      border: 2px solid #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel</h1>
+  <input type="text" id="urlInput" placeholder="Paste Imgur URL" />
+  <button onclick="addPhotoURL()">Add Photo</button>
+  <br/><br/>
+  <input type="file" id="imgUpload" />
+  <h2>Gallery</h2>
+  <ul id="photoList"></ul>
+</body>
+</html>
