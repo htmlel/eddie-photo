@@ -1,77 +1,78 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Eddie Cisneros - Darkroom</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyBS9D1LNFZqQa-I0GLj0jkK4rsfzhaZWp8",
-  authDomain: "eddie-darkroom.firebaseapp.com",
-  projectId: "eddie-darkroom",
-  storageBucket: "eddie-darkroom.firebasestorage.app",
-  messagingSenderId: "636863116260",
-  appId: "1:636863116260:web:4f393bde196d16d22bcdf1"
-};
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyBS9D1LNFZqQa-I0GLj0jkK4rsfzhaZWp8",
+      authDomain: "eddie-darkroom.firebaseapp.com",
+      projectId: "eddie-darkroom",
+      storageBucket: "eddie-darkroom.firebasestorage.app",
+      messagingSenderId: "636863116260",
+      appId: "1:636863116260:web:4f393bde196d16d22bcdf1"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-async function loadPhotos() {
-  const photoCol = collection(db, "photos");
-  const photoSnap = await getDocs(photoCol);
-  const stringDiv = document.getElementById("string");
-  stringDiv.innerHTML = '<div class="string-line"></div>';
+    async function loadPhotos() {
+      const photoCol = collection(db, "photos");
+      const photoSnap = await getDocs(photoCol);
+      const stringDiv = document.getElementById("string");
+      stringDiv.innerHTML = '<div class="string-line"></div>';
 
-  photoSnap.forEach(doc => {
-    const url = doc.data().url;
-    const wrapper = document.createElement("div");
-    wrapper.className = "photo-wrapper";
+      photoSnap.forEach(doc => {
+        const url = doc.data().url;
+        const wrapper = document.createElement("div");
+        wrapper.className = "photo-wrapper";
 
-    const pin = document.createElement("div");
-    pin.className = "clothespin";
+        const pin = document.createElement("div");
+        pin.className = "clothespin";
 
-    const card = document.createElement("div");
-    card.className = "photo-card";
-    card.onclick = () => developPhoto(card, url);
+        const card = document.createElement("div");
+        card.className = "photo-card";
+        card.onclick = () => developPhoto(card, url);
 
-    wrapper.appendChild(pin);
-    wrapper.appendChild(card);
-    stringDiv.appendChild(wrapper);
-  });
-}
+        wrapper.appendChild(pin);
+        wrapper.appendChild(card);
+        stringDiv.appendChild(wrapper);
+      });
+    }
 
-window.onload = loadPhotos;
+    window.onload = loadPhotos;
 
-window.enterDarkroom = function () {
-  const switchImg = document.getElementById("switchImg");
-  switchImg.src = "images/darkmode_switch.png";
+    window.enterDarkroom = function () {
+      const switchImg = document.getElementById("switchImg");
+      switchImg.src = "images/darkmode_switch.png";
 
-  const landing = document.getElementById("landing");
-  landing.style.display = "none";
+      const landing = document.getElementById("landing");
+      landing.style.display = "none";
 
-  document.querySelector(".darkroom").style.display = "flex";
-};
+      document.querySelector(".darkroom").style.display = "flex";
+    };
 
-window.developPhoto = function(card, url) {
-  card.classList.add("fallen");
-  document.getElementById("reveal-img").src = url;
-  document.getElementById("reveal").style.display = "flex";
-};
+    window.developPhoto = function(card, url) {
+      card.classList.add("fallen");
+      document.getElementById("reveal-img").src = url;
+      document.getElementById("reveal").style.display = "flex";
+    };
 
-window.closeReveal = function() {
-  document.getElementById("reveal").style.display = "none";
-};
+    window.closeReveal = function() {
+      document.getElementById("reveal").style.display = "none";
+    };
 
-window.accessAdmin = function() {
-  const pass = prompt("Enter admin password:");
-  if (pass === "darkroom123") {
-    window.location.href = "admin.html";
-  } else {
-    alert("Incorrect password.");
-  }
-};
-
+    window.accessAdmin = function() {
+      const pass = prompt("Enter admin password:");
+      if (pass === "darkroom123") {
+        window.location.href = "admin.html";
+      } else {
+        alert("Incorrect password.");
+      }
+    };
   </script>
   <style>
     body {
@@ -80,137 +81,143 @@ window.accessAdmin = function() {
       color: white;
       overflow: hidden;
       font-family: sans-serif;
-    }.landing {
-  background: white;
-  color: black;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-}
+    }
 
-.darkroom {
-  display: none;
-  position: absolute;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  justify-content: center;
-  align-items: start;
-  padding-top: 60px;
-}
+    .landing {
+      background: white;
+      color: black;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: column;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
 
-.light-switch {
-  position: fixed;
-  left: 30px;
-  top: 30px;
-  width: 80px;
-  height: 140px;
-  cursor: pointer;
-  z-index: 10;
-}
+    .darkroom {
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      justify-content: center;
+      align-items: start;
+      padding-top: 60px;
+    }
 
-.light-switch img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+    .light-switch {
+      position: fixed;
+      left: 30px;
+      top: 30px;
+      width: 80px;
+      height: 140px;
+      cursor: pointer;
+      z-index: 10;
+    }
 
-.string {
-  width: 100vw;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-  position: relative;
-}
+    .light-switch img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
 
-.string-line {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #555;
-  z-index: 0;
-}
+    .string {
+      width: 100vw;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      position: relative;
+    }
 
-.photo-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    .string-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #555;
+      z-index: 0;
+    }
 
-.clothespin {
-  width: 10px;
-  height: 20px;
-  background: #a0522d;
-  margin-bottom: 5px;
-}
+    .photo-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-.photo-card {
-  width: 100px;
-  height: 130px;
-  background: white;
-  cursor: pointer;
-}
+    .clothespin {
+      width: 10px;
+      height: 20px;
+      background: #a0522d;
+      margin-bottom: 5px;
+    }
 
-.reveal {
-  display: none;
-  position: absolute;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: black;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
+    .photo-card {
+      width: 100px;
+      height: 130px;
+      background: white;
+      cursor: pointer;
+    }
 
-.reveal img {
-  max-width: 90vw;
-  max-height: 90vh;
-}
+    .reveal {
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: black;
+      justify-content: center;
+      align-items: center;
+      z-index: 3;
+    }
 
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 2em;
-  background: none;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
+    .reveal img {
+      max-width: 90vw;
+      max-height: 90vh;
+    }
 
-.admin-link {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  color: #444;
-  font-size: 0.85em;
-  text-decoration: none;
-  opacity: 0.6;
-  z-index: 5;
-}
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2em;
+      background: none;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
 
+    .admin-link {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: #444;
+      font-size: 0.85em;
+      text-decoration: none;
+      opacity: 0.6;
+      z-index: 5;
+    }
   </style>
 </head>
 <body>
-  <!-- Light switch is global, not tied to landing -->
   <div class="light-switch" onclick="enterDarkroom()">
     <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
-  </div>  <div class="landing" id="landing">
+  </div>
+
+  <div class="landing" id="landing">
     <a href="#" onclick="accessAdmin()" class="admin-link" id="adminLink">Admin</a>
-  </div>  <div class="darkroom">
+  </div>
+
+  <div class="darkroom">
     <div class="string" id="string">
       <div class="string-line"></div>
     </div>
-  </div>  <div class="reveal" id="reveal">
+  </div>
+
+  <div class="reveal" id="reveal">
     <button class="close-btn" onclick="closeReveal()">&times;</button>
     <img id="reveal-img" src="" alt="Revealed">
   </div>
