@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Eddie Cisneros - Darkroom</title>
   <script type="module">
+    function enterDarkroom() {
+      document.querySelector(".landing").style.display = "none";
+      document.querySelector(".darkroom").style.display = "flex";
+    }
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
@@ -171,7 +175,7 @@
 </head>
 <body>
   <div class="landing" id="landing">
-    <button class="enter-button" onclick="location.reload()">Enter the Darkroom</button>
+    <button class="enter-button" onclick="enterDarkroom()">Enter the Darkroom</button>
     <a href="#" onclick="accessAdmin()" class="admin-link">Admin</a>
   </div>
   <div class="darkroom">
