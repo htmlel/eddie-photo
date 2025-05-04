@@ -48,10 +48,8 @@ window.enterDarkroom = function () {
   switchImg.src = "images/darkmode_switch.png";
 
   const landing = document.getElementById("landing");
-  landing.style.backgroundColor = "black";
-  landing.style.color = "white";
+  landing.style.display = "none";
 
-  document.querySelector(".landing").style.display = "none";
   document.querySelector(".darkroom").style.display = "flex";
 };
 
@@ -108,12 +106,13 @@ window.accessAdmin = function() {
 }
 
 .light-switch {
-  position: absolute;
+  position: fixed;
   left: 30px;
   top: 30px;
   width: 80px;
   height: 140px;
   cursor: pointer;
+  z-index: 10;
 }
 
 .light-switch img {
@@ -202,10 +201,10 @@ window.accessAdmin = function() {
   </style>
 </head>
 <body>
-  <div class="landing" id="landing">
-    <div class="light-switch" onclick="enterDarkroom()">
-      <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
-    </div>
+  <!-- Light switch is global, not tied to landing -->
+  <div class="light-switch" onclick="enterDarkroom()">
+    <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
+  </div>  <div class="landing" id="landing">
     <a href="#" onclick="accessAdmin()" class="admin-link" id="adminLink">Admin</a>
   </div>  <div class="darkroom">
     <div class="string" id="string">
