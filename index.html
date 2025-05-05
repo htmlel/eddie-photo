@@ -1,105 +1,29 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="images/favicon-64x64.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Eddie's Darkroom</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyBS9D1LNFZqQa-I0GLj0jkK4rsfzhaZWp8",
-      authDomain: "eddie-darkroom.firebaseapp.com",
-      projectId: "eddie-darkroom",
-      storageBucket: "eddie-darkroom.firebasestorage.app",
-      messagingSenderId: "636863116260",
-      appId: "1:636863116260:web:4f393bde196d16d22bcdf1"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    async function loadPhotos() {
-      const photoCol = collection(db, "photos");
-      const photoSnap = await getDocs(photoCol);
-      const stringDiv = document.getElementById("string");
-      stringDiv.innerHTML = '';
-
-      photoSnap.forEach(doc => {
-        const url = doc.data().url;
-        const wrapper = document.createElement("div");
-        wrapper.className = "photo-wrapper";
-
-        const pin = document.createElement("div");
-        pin.className = "clothespin";
-
-        const card = document.createElement("div");
-        card.className = "photo-card";
-        card.onclick = () => developPhoto(card, url);
-
-        wrapper.appendChild(pin);
-        wrapper.appendChild(card);
-        stringDiv.appendChild(wrapper);
-      });
-    }
-
-    window.onload = loadPhotos;
-
-    
-window.enterDarkroom = function () {
-  const switchImg = document.getElementById("switchImg");
-  const landing = document.getElementById("landing");
-  const darkroom = document.querySelector(".darkroom");
-
-  const isDarkroomVisible = darkroom.style.display === "flex";
-
-  if (isDarkroomVisible) {
-    // Switch back to light mode
-    switchImg.src = "images/lightmode_switch.png";
-    document.body.style.backgroundColor = "#e6e0d4";
-    darkroom.style.display = "none";
-    landing.style.display = "flex";
-  } else {
-    // Switch to darkroom
-    switchImg.src = "images/darkmode_switch.png";
-  document.body.style.backgroundColor = "#0b0b0b";
-    landing.style.display = "none";
-    darkroom.style.display = "flex";
-  }
-};
-
-
-    window.developPhoto = function(card, url) {
-      card.classList.add("fallen");
-      document.getElementById("reveal-img").src = url;
-      document.getElementById("reveal").style.display = "flex";
-    };
-
-    window.closeReveal = function() {
-      document.getElementById("reveal").style.display = "none";
-    };
-
-    
-  </script>
   <style>
     body {
       margin: 0;
-      background: #0b0b0b;
+      background: #111111;
       color: white;
       overflow: hidden;
       font-family: sans-serif;
     }
 
     .landing {
-      background: #e6e0d4;
+      background: #e9e4dc;
       color: black;
       width: 100vw;
       height: 100vh;
       display: flex;
-      justify-content: flex-start;
-      align-items: center;
+      justify-content: center;
+      align-items: flex-end;
       flex-direction: column;
+      padding-bottom: 90px;
       position: absolute;
       top: 0;
       left: 0;
@@ -113,141 +37,79 @@ window.enterDarkroom = function () {
       width: 100vw; height: 100vh;
       justify-content: center;
       align-items: start;
-      padding-top: 60px;
+      padding-top: 40px;
     }
 
     .light-switch {
-  position: fixed;
-  left: 30px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 80px;
-  height: 140px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.light-switch img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-@media (max-width: 768px) {
-  .light-switch {
-    left: 50%;
-    top: 65%;
-    transform: translate(-50%, -50%);
-  }
-}
-
-
-    .string {
-      width: 100vw;
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-start;
-      position: relative;
-    }
-
-    .string-line {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: #555;
-      z-index: 0;
-    }
-
-    .photo-wrapper {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .clothespin {
-      width: 10px;
-      height: 20px;
-      background: #a0522d;
-      margin-bottom: 5px;
-    }
-
-    .photo-card {
-      width: 100px;
-      height: 130px;
-      background: white;
-      cursor: pointer;
-    }
-
-    .reveal {
-      display: none;
-      position: absolute;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: #0b0b0b;
-      justify-content: center;
-      align-items: center;
-      z-index: 3;
-    }
-
-    .reveal img {
-      max-width: 90vw;
-      max-height: 90vh;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 2em;
-      background: none;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    .admin-link {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      color: #444;
-      font-size: 0.85em;
-      text-decoration: none;
-      opacity: 0.6;
-      z-index: 5;
+      width: 80px;
+      height: 140px;
+      cursor: pointer;
+      z-index: 10;
     }
-  
-.darkroom-image {
-  max-width: 90vw;
-  max-height: 60vh;
-  margin-top: 20px;
-  border-radius: 4px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
-}
 
+    @media (max-width: 768px) {
+      .light-switch {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 30px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .light-switch {
+        left: 30px;
+        top: 30px;
+        transform: none;
+      }
+    }
+
+    .light-switch img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .darkroom-image {
+      max-width: 90vw;
+      max-height: 60vh;
+      margin-top: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 4px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+    }
   </style>
+  <script>
+    function enterDarkroom() {
+      const switchImg = document.getElementById("switchImg");
+      const landing = document.getElementById("landing");
+      const darkroom = document.querySelector(".darkroom");
+
+      const isDark = darkroom.style.display === "flex";
+
+      if (isDark) {
+        switchImg.src = "images/lightmode_switch.png";
+        landing.style.display = "flex";
+        darkroom.style.display = "none";
+      } else {
+        switchImg.src = "images/darkmode_switch.png";
+        landing.style.display = "none";
+        darkroom.style.display = "flex";
+      }
+    }
+  </script>
 </head>
 <body>
   <div class="light-switch" onclick="enterDarkroom()">
     <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
   </div>
 
-  <div class="landing" id="landing">
-    
-  </div>
+  <div class="landing" id="landing"></div>
 
   <div class="darkroom">
     <img src="images/image-1.jpeg" class="darkroom-image" alt="Emotional photo">
-    <div class="string" id="string">
-      
-    </div>
-  </div>
-
-  <div class="reveal" id="reveal">
-    <button class="close-btn" onclick="closeReveal()">&times;</button>
-    <img id="reveal-img" src="" alt="Revealed">
   </div>
 </body>
 </html>
