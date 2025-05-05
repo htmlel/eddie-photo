@@ -80,19 +80,12 @@ window.enterDarkroom = function () {
       document.getElementById("reveal").style.display = "none";
     };
 
-    window.accessAdmin = function() {
-      const pass = prompt("Enter admin password:");
-      if (pass === "darkroom123") {
-        window.location.href = "admin.html";
-      } else {
-        alert("Incorrect password.");
-      }
-    };
+    
   </script>
   <style>
     body {
       margin: 0;
-      background: black;
+      background: #0b0b0b;
       color: white;
       overflow: hidden;
       font-family: sans-serif;
@@ -143,7 +136,7 @@ window.enterDarkroom = function () {
 @media (max-width: 768px) {
   .light-switch {
     left: 50%;
-    top: 50%;
+    top: 65%;
     transform: translate(-50%, -50%);
   }
 }
@@ -193,7 +186,7 @@ window.enterDarkroom = function () {
       position: absolute;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: black;
+      background: #0b0b0b;
       justify-content: center;
       align-items: center;
       z-index: 3;
@@ -233,7 +226,7 @@ window.enterDarkroom = function () {
   </div>
 
   <div class="landing" id="landing">
-    <a href="#" onclick="accessAdmin()" class="admin-link" id="adminLink">Admin</a>
+    
   </div>
 
   <div class="darkroom">
