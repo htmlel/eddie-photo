@@ -2,31 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Eddie's Darkroom</title>
   <style>
     body {
       margin: 0;
+      background-color: #e7e4d7;
       font-family: sans-serif;
-      background-color: #e7e4d8;
+      transition: background-color 0.3s;
     }
 
     .container {
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
-      justify-content: space-between;
       height: 100vh;
-      padding: 30px 0;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
-    .photo-placeholder {
+    .white-box {
       width: 90vw;
       max-width: 600px;
-      aspect-ratio: 3 / 2;
+      aspect-ratio: 3/2;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      margin-bottom: 40px;
     }
 
     .light-switch {
@@ -46,28 +49,39 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
-        padding: 0 60px;
+        gap: 60px;
+        padding-left: 60px;
       }
-
-      .photo-placeholder {
-        margin-right: auto;
-      }
-
-      .light-switch {
-        position: absolute;
-        left: 30px;
-        top: 50%;
-        transform: translateY(-50%);
+      .white-box {
+        margin-bottom: 0;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="photo-placeholder"></div>
-    <div class="light-switch">
-      <img src="images/lightmode_switch.png" alt="Switch">
+    <div class="white-box"></div>
+    <div class="light-switch" onclick="toggleDarkroom()">
+      <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
     </div>
   </div>
+
+  <script>
+    let isDark = false;
+
+    function toggleDarkroom() {
+      const switchImg = document.getElementById("switchImg");
+      const body = document.body;
+
+      isDark = !isDark;
+      if (isDark) {
+        switchImg.src = "images/darkmode_switch.png";
+        body.style.backgroundColor = "#111";
+      } else {
+        switchImg.src = "images/lightmode_switch.png";
+        body.style.backgroundColor = "#e7e4d7";
+      }
+    }
+  </script>
 </body>
 </html>
