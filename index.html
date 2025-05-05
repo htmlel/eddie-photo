@@ -2,84 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eddie's Darkroom</title>
   <style>
     body {
       margin: 0;
-      background-color: #e7e4d7;
       font-family: sans-serif;
-      transition: background-color 0.3s;
+      background-color: #e8e5d9;
+      transition: background-color 0.3s ease;
     }
 
     .container {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: flex-end;
       height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
+      padding-bottom: 60px;
+      position: relative;
     }
 
-    .white-box {
+    .placeholder {
       width: 90vw;
-      max-width: 600px;
-      aspect-ratio: 3/2;
+      max-width: 450px;
+      height: auto;
+      aspect-ratio: 3 / 2;
       background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
       margin-bottom: 40px;
+      transition: background 0.3s ease;
+    }
+
+    .placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
     }
 
     .light-switch {
-      width: 80px;
-      height: 140px;
+      width: 60px;
+      height: 110px;
       cursor: pointer;
+      transition: transform 0.2s ease;
     }
 
-    .light-switch img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+    .dark-mode {
+      background-color: #111;
     }
 
     @media (min-width: 768px) {
       .container {
         flex-direction: row;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
+        padding-bottom: 0;
         gap: 60px;
-        padding-left: 60px;
       }
-      .white-box {
+
+      .placeholder {
         margin-bottom: 0;
+      }
+
+      .light-switch {
+        align-self: center;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="white-box"></div>
-    <div class="light-switch" onclick="toggleDarkroom()">
-      <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
+    <div class="placeholder" id="displayBox">
+      <!-- Image will appear here in dark mode -->
     </div>
+    <img
+      id="switchImg"
+      class="light-switch"
+      src="images/lightmode_switch.png"
+      alt="Light Switch"
+      onclick="toggleMode()"
+    />
   </div>
 
   <script>
     let isDark = false;
 
-    function toggleDarkroom() {
-      const switchImg = document.getElementById("switchImg");
-      const body = document.body;
-
+    function toggleMode() {
       isDark = !isDark;
+
+      const body = document.body;
+      const switchImg = document.getElementById("switchImg");
+      const displayBox = document.getElementById("displayBox");
+
       if (isDark) {
+        body.classList.add("dark-mode");
         switchImg.src = "images/darkmode_switch.png";
-        body.style.backgroundColor = "#111";
+
+        // Show the image
+        displayBox.innerHTML = '<img src="images/image-1.jpeg" alt="Emotional photo">';
       } else {
+        body.classList.remove("dark-mode");
         switchImg.src = "images/lightmode_switch.png";
-        body.style.backgroundColor = "#e7e4d7";
+
+        // Reset to white box
+        displayBox.innerHTML = "";
       }
     }
   </script>
