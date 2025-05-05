@@ -6,13 +6,12 @@
   <title>Eddie Cisneros - Darkroom</title>
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: sans-serif;
       background-color: #e8ead8;
       display: flex;
       flex-direction: column;
@@ -22,24 +21,24 @@
       transition: background-color 0.4s ease;
     }
 
-    .photo-container {
+    .photo-box {
+      position: relative;
       width: 90vw;
       max-width: 600px;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 488 / 349; /* Accurate to your image */
       background-color: white;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      transition: background-color 0.4s ease, box-shadow 0.4s ease;
+      transition: background-color 0.4s ease;
     }
 
-    .photo-container img {
+    .photo-box img {
       width: 100%;
       height: auto;
-      display: block;
+      display: none;
     }
 
     .light-switch {
@@ -55,4 +54,44 @@
 
     @media (max-width: 768px) {
       .light-switch {
-        bot
+        bottom: 10px;
+        transform: translateX(-50%) scale(0.85);
+      }
+    }
+
+    .dark body {
+      background-color: #111;
+    }
+
+    .dark .photo-box {
+      background-color: transparent;
+    }
+
+    .dark .photo-box img {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="photo-box">
+    <img id="photo" src="your-photo.jpg" alt="Darkroom photo">
+  </div>
+
+  <button class="light-switch" onclick="toggleMode()">
+    <img src="https://i.imgur.com/iH3D9qf.png" width="40" alt="Switch">
+  </button>
+
+  <script>
+    function toggleMode() {
+      const root = document.documentElement;
+      if (root.classList.contains("light")) {
+        root.classList.remove("light");
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+        root.classList.add("light");
+      }
+    }
+  </script>
+</body>
+</html>
