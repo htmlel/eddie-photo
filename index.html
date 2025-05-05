@@ -21,7 +21,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      padding-top: 40px;
       position: absolute;
       top: 0;
       left: 0;
@@ -29,18 +30,20 @@
     }
 
     .placeholder-image {
-      width: 700px;
+      width: 90vw;
+      max-width: 700px;
       aspect-ratio: 3/2;
-      background-color: #e5e1d3;
+      background-color: #ffffff;
       border-radius: 10px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
     }
 
     .light-switch {
+      position: fixed;
       width: 80px;
       height: 140px;
       cursor: pointer;
-      position: fixed;
       z-index: 10;
     }
 
