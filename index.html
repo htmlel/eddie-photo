@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eddie's Darkroom</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eddie Cisneros - Darkroom</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,113 +12,47 @@
     }
 
     body {
-      background-color: #e8e5d7; /* matches switch */
       font-family: sans-serif;
-      overflow: hidden;
-      height: 100vh;
-    }
-
-    .container {
+      background-color: #e8ead8;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       align-items: center;
-      height: 100vh;
-      padding: 20px;
+      justify-content: center;
+      min-height: 100vh;
+      transition: background-color 0.4s ease;
     }
 
-    .light-mode {
-      background-color: #e8e5d7;
-      color: black;
-    }
-
-    .dark-mode {
-      background-color: #111;
-      color: white;
-    }
-
-    .photo-wrapper {
+    .photo-container {
+      width: 90vw;
+      max-width: 600px;
+      aspect-ratio: 4 / 3;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
+      transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .photo-container img {
+      width: 100%;
       height: auto;
-    }
-
-    .photo-img {
-      max-width: 90vw;
-      max-height: 60vh;
-      object-fit: contain;
       display: block;
-      clip-path: inset(0px 0px 5px 0px); /* crop white bottom line */
     }
 
-    .white-rectangle {
-      width: 90vw;
-      height: 60vh;
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .switch {
-      width: 60px;
-      height: 120px;
+    .light-switch {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: none;
+      border: none;
       cursor: pointer;
     }
 
-    @media (min-width: 768px) {
-      .container {
-        flex-direction: row;
-        justify-content: center;
-        gap: 60px;
-      }
-
-      .photo-wrapper, .switch-container {
-        flex-shrink: 0;
-      }
-    }
-
-    .switch-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-    }
-  </style>
-</head>
-<body class="light-mode">
-  <div class="container">
-    <div class="photo-wrapper" id="photoArea">
-      <div class="white-rectangle" id="whitePlaceholder"></div>
-    </div>
-    <div class="switch-container">
-      <img 
-        src="images/lightmode_switch.png" 
-        alt="Light switch" 
-        class="switch" 
-        id="lightSwitch"
-      >
-    </div>
-  </div>
-
-  <script>
-    const body = document.body;
-    const switchImg = document.getElementById('lightSwitch');
-    const photoArea = document.getElementById('photoArea');
-
-    let isLight = true;
-
-    switchImg.addEventListener('click', () => {
-      isLight = !isLight;
-      if (!isLight) {
-        body.classList.replace('light-mode', 'dark-mode');
-        switchImg.src = 'images/darkmode_switch.png';
-        photoArea.innerHTML = `<img src="images/image-1.jpeg" alt="Emotional photo" class="photo-img">`;
-      } else {
-        body.classList.replace('dark-mode', 'light-mode');
-        switchImg.src = 'images/lightmode_switch.png';
-        photoArea.innerHTML = `<div class="white-rectangle" id="whitePlaceholder"></div>`;
-      }
-    });
-  </script>
-</body>
-</html>
+    @media (max-width: 768px) {
+      .light-switch {
+        bot
