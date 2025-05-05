@@ -29,10 +29,9 @@
     }
 
     .placeholder-image {
-      max-width: 90vw;
-      max-height: 80vh;
-      width: auto;
-      height: auto;
+      width: 90vw;
+      max-width: 700px;
+      aspect-ratio: 3 / 2;
       background-color: #ffffff;
       border-radius: 10px;
       margin-bottom: 20px;
@@ -56,19 +55,10 @@
     }
 
     @media (min-width: 769px) {
-      .landing {
-        justify-content: center;
-        padding-top: 0;
-        flex-direction: row;
-        gap: 40px;
-      }
-
       .light-switch {
-        position: relative;
-        left: 0;
-        top: 0;
-        transform: none;
-        align-self: center;
+        left: calc(50% + 370px);
+        top: 50%;
+        transform: translateY(-50%);
       }
     }
 
@@ -91,15 +81,6 @@
       align-items: center;
       justify-content: flex-start;
       padding-top: 40px;
-    }
-
-    @media (min-width: 769px) {
-      .darkroom {
-        justify-content: center;
-        padding-top: 0;
-        flex-direction: row;
-        gap: 40px;
-      }
     }
 
     .darkroom-image {
@@ -132,11 +113,12 @@
   </script>
 </head>
 <body>
+  <div class="light-switch" onclick="enterDarkroom()">
+    <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
+  </div>
+
   <div class="landing" id="landing">
     <div class="placeholder-image"></div>
-    <div class="light-switch" onclick="enterDarkroom()">
-      <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
-    </div>
   </div>
 
   <div class="darkroom">
