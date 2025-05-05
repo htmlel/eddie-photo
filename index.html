@@ -1,114 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eddie's Darkroom</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #e8e5d7; /* matches switch */
       font-family: sans-serif;
-      background-color: #e8e5d9;
-      transition: background-color 0.3s ease;
+      overflow: hidden;
+      height: 100vh;
     }
 
     .container {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      justify-content: flex-end;
       height: 100vh;
-      padding-bottom: 60px;
-      position: relative;
+      padding: 20px;
     }
 
-    .placeholder {
-      width: 90vw;
-      max-width: 450px;
-      height: auto;
-      aspect-ratio: 3 / 2;
-      background-color: white;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-      margin-bottom: 40px;
-      transition: background 0.3s ease;
-    }
-
-    .placeholder img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-    .light-switch {
-      width: 60px;
-      height: 110px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
+    .light-mode {
+      background-color: #e8e5d7;
+      color: black;
     }
 
     .dark-mode {
       background-color: #111;
+      color: white;
+    }
+
+    .photo-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: auto;
+    }
+
+    .photo-img {
+      max-width: 90vw;
+      max-height: 60vh;
+      object-fit: contain;
+      display: block;
+      clip-path: inset(0px 0px 5px 0px); /* crop white bottom line */
+    }
+
+    .white-rectangle {
+      width: 90vw;
+      height: 60vh;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .switch {
+      width: 60px;
+      height: 120px;
+      cursor: pointer;
     }
 
     @media (min-width: 768px) {
       .container {
         flex-direction: row;
         justify-content: center;
-        align-items: center;
-        padding-bottom: 0;
         gap: 60px;
       }
 
-      .placeholder {
-        margin-bottom: 0;
+      .photo-wrapper, .switch-container {
+        flex-shrink: 0;
       }
+    }
 
-      .light-switch {
-        align-self: center;
-      }
+    .switch-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
     }
   </style>
 </head>
-<body>
+<body class="light-mode">
   <div class="container">
-    <div class="placeholder" id="displayBox">
-      <!-- Image will appear here in dark mode -->
+    <div class="photo-wrapper" id="photoArea">
+      <div class="white-rectangle" id="whitePlaceholder"></div>
     </div>
-    <img
-      id="switchImg"
-      class="light-switch"
-      src="images/lightmode_switch.png"
-      alt="Light Switch"
-      onclick="toggleMode()"
-    />
+    <div class="switch-container">
+      <img 
+        src="images/lightmode_switch.png" 
+        alt="Light switch" 
+        class="switch" 
+        id="lightSwitch"
+      >
+    </div>
   </div>
 
   <script>
-    let isDark = false;
+    const body = document.body;
+    const switchImg = document.getElementById('lightSwitch');
+    const photoArea = document.getElementById('photoArea');
 
-    function toggleMode() {
-      isDark = !isDark;
+    let isLight = true;
 
-      const body = document.body;
-      const switchImg = document.getElementById("switchImg");
-      const displayBox = document.getElementById("displayBox");
-
-      if (isDark) {
-        body.classList.add("dark-mode");
-        switchImg.src = "images/darkmode_switch.png";
-
-        // Show the image
-        displayBox.innerHTML = '<img src="images/image-1.jpeg" alt="Emotional photo">';
+    switchImg.addEventListener('click', () => {
+      isLight = !isLight;
+      if (!isLight) {
+        body.classList.replace('light-mode', 'dark-mode');
+        switchImg.src = 'images/darkmode_switch.png';
+        photoArea.innerHTML = `<img src="images/image-1.jpeg" alt="Emotional photo" class="photo-img">`;
       } else {
-        body.classList.remove("dark-mode");
-        switchImg.src = "images/lightmode_switch.png";
-
-        // Reset to white box
-        displayBox.innerHTML = "";
+        body.classList.replace('dark-mode', 'light-mode');
+        switchImg.src = 'images/lightmode_switch.png';
+        photoArea.innerHTML = `<div class="white-rectangle" id="whitePlaceholder"></div>`;
       }
-    }
+    });
   </script>
 </body>
 </html>
