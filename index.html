@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,9 +29,10 @@
     }
 
     .placeholder-image {
-      width: 90vw;
-      max-width: 700px;
-      aspect-ratio: 3/2;
+      max-width: 90vw;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
       background-color: #ffffff;
       border-radius: 10px;
       margin-bottom: 20px;
@@ -56,10 +56,19 @@
     }
 
     @media (min-width: 769px) {
+      .landing {
+        justify-content: center;
+        padding-top: 0;
+        flex-direction: row;
+        gap: 40px;
+      }
+
       .light-switch {
-        left: 30px;
-        top: 50%;
-        transform: translateY(-50%);
+        position: relative;
+        left: 0;
+        top: 0;
+        transform: none;
+        align-self: center;
       }
     }
 
@@ -84,9 +93,18 @@
       padding-top: 40px;
     }
 
+    @media (min-width: 769px) {
+      .darkroom {
+        justify-content: center;
+        padding-top: 0;
+        flex-direction: row;
+        gap: 40px;
+      }
+    }
+
     .darkroom-image {
       max-width: 90vw;
-      max-height: 60vh;
+      max-height: 80vh;
       border-radius: 10px;
       box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
     }
@@ -114,16 +132,18 @@
   </script>
 </head>
 <body>
-  <div class="light-switch" onclick="enterDarkroom()">
-    <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
-  </div>
-
   <div class="landing" id="landing">
     <div class="placeholder-image"></div>
+    <div class="light-switch" onclick="enterDarkroom()">
+      <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
+    </div>
   </div>
 
   <div class="darkroom">
     <img src="images/image-1.jpeg" class="darkroom-image" alt="Emotional photo">
+    <div class="light-switch" onclick="enterDarkroom()">
+      <img src="images/darkmode_switch.png" alt="Switch" />
+    </div>
   </div>
 </body>
 </html>
