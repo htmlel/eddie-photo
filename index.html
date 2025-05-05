@@ -8,60 +8,36 @@
   <style>
     body {
       margin: 0;
-      background: #111111;
-      color: white;
-      overflow: hidden;
+      background: #e5e1d3;
+      color: black;
       font-family: sans-serif;
+      overflow: hidden;
     }
 
     .landing {
-      background: #e9e4dc;
-      color: black;
       width: 100vw;
       height: 100vh;
+      background: #e5e1d3;
       display: flex;
-      justify-content: center;
-      align-items: flex-end;
       flex-direction: column;
-      padding-bottom: 90px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 60px;
     }
 
-    .darkroom {
-      display: none;
-      position: absolute;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      justify-content: center;
-      align-items: start;
-      padding-top: 40px;
+    .placeholder-image {
+      width: 700px;
+      height: auto;
+      aspect-ratio: 3/2;
+      background-color: #e5e1d3;
+      border-radius: 10px;
+      margin-bottom: 30px;
     }
 
     .light-switch {
-      position: fixed;
       width: 80px;
       height: 140px;
       cursor: pointer;
-      z-index: 10;
-    }
-
-    @media (max-width: 768px) {
-      .light-switch {
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 30px;
-      }
-    }
-
-    @media (min-width: 769px) {
-      .light-switch {
-        left: 30px;
-        top: 30px;
-        transform: none;
-      }
     }
 
     .light-switch img {
@@ -70,46 +46,24 @@
       object-fit: contain;
     }
 
-    .darkroom-image {
-      max-width: 90vw;
-      max-height: 60vh;
-      margin-top: 20px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      border-radius: 4px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
-    }
-  </style>
-  <script>
-    function enterDarkroom() {
-      const switchImg = document.getElementById("switchImg");
-      const landing = document.getElementById("landing");
-      const darkroom = document.querySelector(".darkroom");
+    @media (max-width: 768px) {
+      .placeholder-image {
+        width: 90vw;
+      }
 
-      const isDark = darkroom.style.display === "flex";
-
-      if (isDark) {
-        switchImg.src = "images/lightmode_switch.png";
-        landing.style.display = "flex";
-        darkroom.style.display = "none";
-      } else {
-        switchImg.src = "images/darkmode_switch.png";
-        landing.style.display = "none";
-        darkroom.style.display = "flex";
+      .light-switch {
+        position: relative;
+        margin-bottom: 30px;
       }
     }
-  </script>
+  </style>
 </head>
 <body>
-  <div class="light-switch" onclick="enterDarkroom()">
-    <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
-  </div>
-
-  <div class="landing" id="landing"></div>
-
-  <div class="darkroom">
-    <img src="images/image-1.jpeg" class="darkroom-image" alt="Emotional photo">
+  <div class="landing">
+    <div class="placeholder-image"></div>
+    <div class="light-switch" onclick="console.log('Switch clicked')">
+      <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
+    </div>
   </div>
 </body>
 </html>
