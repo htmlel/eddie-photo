@@ -27,7 +27,7 @@
       inset: 0;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255, 40, 20, 0.35), transparent 70%),
+        radial-gradient(ellipse 70% 55% at calc(50% + var(--lamp-shift, 0px)) 0%, rgba(255, 40, 20, 0.35), transparent 70%),
         radial-gradient(ellipse 120% 70% at 50% 100%, rgba(120, 0, 0, 0.25), transparent 70%);
       opacity: 0;
       transition: opacity 1.2s ease;
@@ -119,8 +119,8 @@
     body.dark .water { background: #150707; }
     body.dark .sheen {
       background:
-        radial-gradient(ellipse 14% 9% at 50% 9%, rgba(255, 70, 40, 0.6), transparent 70%),
-        radial-gradient(ellipse 55% 30% at 50% 8%, rgba(255, 40, 20, 0.14), transparent 70%);
+        radial-gradient(ellipse 14% 9% at calc(50% + var(--lamp-shift, 0px)) 9%, rgba(255, 70, 40, 0.6), transparent 70%),
+        radial-gradient(ellipse 55% 30% at calc(50% + var(--lamp-shift, 0px)) 8%, rgba(255, 40, 20, 0.14), transparent 70%);
       animation: drift 9s ease-in-out infinite alternate, flicker 1.2s steps(1);
     }
 
@@ -155,17 +155,38 @@
       pointer-events: none;
     }
 
-    /* the sheet slides in from the left and settles flat into the liquid */
-    body.dark .print { background: #1a0705; animation: dip 0.6s cubic-bezier(0.2, 0.7, 0.3, 1); }
+    /* the sheet is lowered in from above: larger and casting a loose shadow while held over the tub, then settling flat */
+    body.dark .print { background: #1a0705; animation: dip 0.7s cubic-bezier(0.3, 0.6, 0.3, 1); }
     body.dark .print img { animation: develop 5s ease-out 0.8s forwards; }
-    /* red cast while developing, then lifts to show the true black and white */
-    body.dark .print::after { animation: safelight-cast 9s ease forwards; }
+    /* everything is red under the safelight; the true black and white only shows with the lights on */
+    body.dark .print::after { opacity: 0.35; }
+
+    /* once developed, the print stays developed: no second dip, no second develop.
+       Lights on before it finishes and the paper is still blank, like a ruined sheet */
+    body.developed .print { animation: none; }
+    body.developed .print img { animation: none; opacity: 1; }
 
     .hint { margin: 0; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; }
-    body.dark .hint { visibility: hidden; }
+    /* the hint sits under the counter, centred in the space below its front edge */
+    .hint {
+      --under: 16vh;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc((var(--under) - var(--scene) * 0.035) / 2);
+      transform: translateY(50%);
+      text-align: center;
+    }
+
+    /* no hint while it develops; once it has, invite them back into the light */
+    .hint .after { display: none; }
+    body.developed .hint .before { display: none; }
+    body.developed .hint .after { display: inline; }
+    body.dark .hint, body.developed:not(.dark) .hint { visibility: hidden; }
+    body.dark.developed .hint { visibility: visible; }
 
     @keyframes dip {
-      from { transform: translate(-14px, -8px) rotate(-1.5deg) scale(1.03); box-shadow: 0 14px 22px rgba(0, 0, 0, 0.45); }
+      from { transform: translateY(-3%) scale(1.07); box-shadow: 0 26px 30px rgba(0, 0, 0, 0.4); }
     }
 
     .switch {
@@ -260,18 +281,190 @@
       to { transform: translate(3%, 2%) scale(1.05); }
     }
 
-    @keyframes safelight-cast {
-      0%   { opacity: 0; }
-      15%  { opacity: 0.35; }
-      65%  { opacity: 0.35; }
-      100% { opacity: 0; }
-    }
-
     @media (prefers-reduced-motion: reduce) {
       body.dark::before, body.dark .safelight * { animation: none; }
-      body.dark .print::after, .sheen, body.dark .sheen { animation: none; }
+      .sheen, body.dark .sheen { animation: none; }
       body.dark .print img { animation-duration: 0.01s; animation-delay: 0s; }
       body.dark .print { animation: none; }
+    }
+
+    /* ---- 3D: a darkroom counter against the wall, a developing tub on it ---- */
+
+    /* one scale for the whole scene, so the tub, lamp and counter stay in proportion at any window size */
+    :root { --scene: min(1000px, 92vw, 140vh); }
+
+    main {
+      perspective: 1000px;
+      perspective-origin: 50% 20%;
+      justify-content: flex-end;
+      gap: 0;
+      padding: 0 0 16vh;
+      /* the counter is wider than the screen; without this a phone widens the whole page to fit it */
+      overflow: hidden;
+    }
+
+    /* the counter: wider than the window, its back edge against the wall. It carries the tub,
+       so both share one 3D space */
+    .table {
+      --tilt: 55deg;
+      position: relative;
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 160vw;
+      height: calc(var(--scene) * 0.6);
+      background-color: #cfc7b2;
+      /* darker where it meets the wall, lighter toward you */
+      background-image: linear-gradient(rgba(0, 0, 0, 0.14), transparent 45%, rgba(255, 255, 255, 0.1));
+      transform: rotateX(var(--tilt));
+      transform-origin: 50% 100%;
+      transform-style: preserve-3d;
+      transition: background-color 0.6s;
+    }
+
+    /* the counter's front edge, hinged down from the near side to show its thickness */
+    .table::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: calc(var(--scene) * 0.04);
+      background: #b3aa93;
+      transform-origin: top;
+      transform: rotateX(-90deg);
+      transition: background-color 0.6s;
+    }
+
+    /* under the counter */
+    main::after {
+      content: "";
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 16vh;
+      z-index: -1;
+      background: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.06));
+    }
+
+    body.dark .table { background-color: #170c0b; }
+    body.dark .table::after { background-color: #0d0605; }
+
+    /* a developed print can be picked up */
+    body.developed .print { cursor: grab; }
+    body.developed .print:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+    /* holding the print: up off the table, square to you, the room dimmed behind it */
+    .held {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.55);
+      cursor: grabbing;
+    }
+    .held[hidden] { display: none; }
+
+    .held-print {
+      position: relative;
+      margin: 0;
+      width: min(90vw, 1000px, calc(88vh * 1.4));
+      aspect-ratio: 5704 / 4073;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+    .held-print img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    /* still red if you pick it up under the safelight */
+    .held-print::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: #ff2a1a;
+      mix-blend-mode: multiply;
+      opacity: 0;
+    }
+    body.dark .held-print::after { opacity: 0.35; }
+
+    /* the developing tub: raised off the counter on its own walls, turned a little */
+    .tray {
+      --turn: 0deg;
+      --rim: calc(var(--scene) * 0.022);
+      --edge: calc(var(--scene) * 0.016);
+      --depth: calc(var(--scene) * 0.03);
+      position: relative;
+      transform: translateZ(var(--depth)) rotateZ(var(--turn));
+      transform-style: preserve-3d;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+    }
+    body.dark .tray { box-shadow: inset 0 1px 0 rgba(255, 70, 50, 0.2), 0 0 60px rgba(255, 40, 20, 0.12); }
+
+    /* the tub's front wall, from the rim down to the counter */
+    .tray::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: var(--depth);
+      border-radius: 0 0 10px 10px;
+      background: linear-gradient(#bfb7a1, #a9a08a);
+      transform-origin: top;
+      transform: rotateX(-90deg);
+    }
+    body.dark .tray::after { background: linear-gradient(#1a1211, #0c0807); }
+
+    /* its shadow on the counter, cast forward by the light overhead */
+    .tray::before {
+      content: "";
+      position: absolute;
+      inset: 4% -2% -6%;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.28);
+      filter: blur(14px);
+      transform: translateZ(calc(var(--depth) * -1));
+    }
+
+    /* the inside of the far wall, seen over the liquid */
+    .bath::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 16%;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(rgba(0, 0, 0, 0.22), transparent);
+    }
+
+    .print { width: calc(var(--scene) * 0.46); }
+
+    /* the lamp hangs over the counter at the scene's scale */
+    /* the box frames just the lamp (its cord runs up out of it); the bulb hangs a little above the counter */
+    /* above the scene, which would otherwise catch the pointer first */
+    .safelight { z-index: 5; }
+    /* the script places the lamp with plain SVG rotations; the cord is a line, not a shape */
+    .safelight .lamp { transform-origin: 0 0; }
+    .safelight .cord { fill: none; pointer-events: stroke; }
+
+    .safelight {
+      --lamp: calc(var(--scene) * 0.16);
+      width: var(--lamp);
+      height: calc(var(--lamp) * 70 / 80);
+      top: calc(22vh - var(--lamp) * 0.6);
+    }
+
+    /* phones: a tall screen, so the counter fills most of it, seen from a little higher up;
+       the tub, lamp and switch are sized to the screen width */
+    @media (max-width: 768px) {
+      .table { --tilt: 40deg; height: 60vh; }
+      main { padding-bottom: 18vh; }
+      .hint { --under: 18vh; }
+      .print { width: 72vw; }
+      .safelight { --lamp: 24vw; top: calc(15vh - var(--lamp) * 0.6); }
+      .switch { left: 16px; top: 6vh; bottom: auto; transform: none; }
     }
   </style>
 </head>
@@ -286,18 +479,19 @@
     </filter>
   </svg>
 
-  <svg class="safelight" viewBox="0 0 80 110" overflow="visible" aria-hidden="true">
+  <svg class="safelight" viewBox="0 30 80 70" overflow="visible" aria-hidden="true">
     <defs>
       <radialGradient id="halo">
         <stop offset="0" stop-color="#ff3a22" stop-opacity="0.8" />
         <stop offset="1" stop-color="#ff3a22" stop-opacity="0" />
       </radialGradient>
     </defs>
+    <!-- the cord runs up past the top of the screen to the ceiling; the script bends it as the lamp swings -->
+    <path class="cord" id="cord" d="M40 -2000 L40 46" />
     <g class="lamp" id="lamp">
       <!-- light only spills out below the shade's rim -->
       <clipPath id="below-shade"><rect x="-60" y="71" width="200" height="60" /></clipPath>
       <ellipse class="halo" cx="40" cy="76" rx="32" ry="30" fill="url(#halo)" clip-path="url(#below-shade)" />
-      <line class="cord" x1="40" y1="0" x2="40" y2="46" />
       <rect class="shade" x="35" y="44" width="10" height="9" rx="2" />
       <ellipse class="bulb" cx="40" cy="74" rx="10" ry="9" />
       <path class="shade" d="M22 72 L33 52 H47 L58 72 Z" />
@@ -305,6 +499,7 @@
   </svg>
 
   <main>
+    <div class="table">
     <div class="tray">
       <div class="bath">
         <div class="water">
@@ -315,9 +510,16 @@
         </div>
       </div>
     </div>
+    </div>
 
-    <p class="hint">Turn off the lights</p>
+    <p class="hint"><span class="before">Turn off the lights</span><span class="after">Turn on the lights</span></p>
   </main>
+
+  <div class="held" id="held" tabindex="-1" hidden>
+    <figure class="held-print">
+      <img src="images/photo-01.jpg" alt="A woman rests her hand on the shoulder of an elderly woman who covers her face, in black and white" />
+    </figure>
+  </div>
 
   <button class="switch" id="switch" aria-label="Darkroom light" aria-pressed="false">
     <span class="plate" aria-hidden="true">
@@ -335,20 +537,109 @@
       lightSwitch.setAttribute("aria-pressed", dark);
     });
 
-    // the lamp is a damped pendulum: the pointer pushes it, gravity and friction bring it home
+    const print = document.querySelector(".print");
+    const tray = document.querySelector(".tray"), table = document.querySelector(".table");
+    const held = document.getElementById("held");
+    const heldPrint = held.querySelector(".held-print");
+    let holding = false;
+
+    print.querySelector("img").addEventListener("animationend", (e) => {
+      if (e.animationName !== "develop") return;
+      document.body.classList.add("developed");
+      print.tabIndex = 0;
+      print.setAttribute("role", "button");
+      print.setAttribute("aria-label", "Pick up the print");
+    });
+
+    // where the print lies in the tray, as a transform on the held print (which sits
+    // centred and flat): shifted, shrunk and tilted back by the tray's own angle
+    function inTray() {
+      const from = print.getBoundingClientRect(), to = heldPrint.getBoundingClientRect();
+      const tilt = getComputedStyle(table).getPropertyValue("--tilt"), turn = getComputedStyle(tray).getPropertyValue("--turn");
+      const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+      const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+      return `perspective(1000px) translate(${dx}px, ${dy}px) scale(${from.width / to.width}) rotateX(${tilt}) rotateZ(${turn})`;
+    }
+
+    function pickUp() {
+      if (holding || !document.body.classList.contains("developed")) return;
+      holding = true;
+      held.hidden = false;
+      const start = inTray();
+      print.style.visibility = "hidden";
+      const time = calm.matches ? 0 : 550;
+      heldPrint.animate([{ transform: start, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)" }, {}], { duration: time, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
+      held.animate([{ backgroundColor: "rgba(0, 0, 0, 0)" }, {}], { duration: time });
+      held.focus();
+    }
+
+    function putDown() {
+      if (!holding) return;
+      const time = calm.matches ? 0 : 450;
+      const back = heldPrint.animate([{}, { transform: inTray(), boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)" }], { duration: time, easing: "ease-in", fill: "forwards" });
+      held.animate([{}, { backgroundColor: "rgba(0, 0, 0, 0)" }], { duration: time, fill: "forwards" });
+      back.onfinish = () => {
+        held.hidden = true;
+        held.getAnimations().forEach((a) => a.cancel());
+        back.cancel();
+        print.style.visibility = "";
+        holding = false;
+        print.focus();
+      };
+    }
+
+    print.addEventListener("click", pickUp);
+    print.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pickUp(); }
+    });
+    held.addEventListener("click", putDown);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") putDown(); });
+
+    // the lamp hangs from the ceiling (the top of the screen) on a flexible cord. The cord swings
+    // as a damped pendulum: the pointer pushes it, gravity and friction bring it home. The cord
+    // bows behind the motion and the lamp lags a little on the end of it, so nothing moves as one stick
     const lamp = document.getElementById("lamp");
-    const GRAVITY = 22, FRICTION = 1.8, MAX_SPIN = 2;
-    let angle = 0, spin = 0, last = 0, running = false;
+    const cord = document.getElementById("cord");
+    const GRAVITY = 14, FRICTION = 1.6, MAX_SPIN = 0.45;
+    const END_X = 40, END_Y = 46; // where the cord meets the lamp, in the svg's units
+    const deg = (rad) => (rad * 180) / Math.PI;
+    let ceiling = 0, unitsPerPx = 1, angle = 0, spin = 0, sway = 0, last = 0, running = false;
+
+    function draw() {
+      const length = END_Y - ceiling;
+      // positive angles swing the lamp left, as SVG rotations do
+      const ex = END_X - length * Math.sin(angle), ey = ceiling + length * Math.cos(angle);
+      // the cord's middle trails the way it's moving, so it bends like a cord, not a rod
+      const bow = spin * length * 0.12;
+      const cx = (END_X + ex) / 2 + bow * Math.cos(angle), cy = (ceiling + ey) / 2 + bow * Math.sin(angle);
+      cord.setAttribute("d", `M${END_X} ${ceiling} Q${cx} ${cy} ${ex} ${ey}`);
+      lamp.setAttribute("transform", `rotate(${deg(angle)} ${END_X} ${ceiling}) rotate(${deg(sway)} ${END_X} ${END_Y})`);
+      // how far the bulb has moved sideways, so the room's glow and its reflection in the tub follow it
+      const bulbX = ex - (74 - END_Y) * Math.sin(angle + sway);
+      document.documentElement.style.setProperty("--lamp-shift", `${(bulbX - END_X) / unitsPerPx}px`);
+    }
+
+    // the ceiling is the top of the screen, measured in the svg's units
+    function hang() {
+      const box = lamp.ownerSVGElement.getBoundingClientRect();
+      unitsPerPx = 70 / box.height;
+      ceiling = 30 - box.top * unitsPerPx;
+      draw();
+    }
+    hang();
+    addEventListener("resize", hang);
 
     function step(now) {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       spin += (-GRAVITY * Math.sin(angle) - FRICTION * spin) * dt;
       angle += spin * dt;
-      lamp.style.transform = `rotate(${angle}rad)`;
-      if (Math.abs(angle) < 0.001 && Math.abs(spin) < 0.005) {
-        angle = spin = 0;
-        lamp.style.transform = "";
+      // the lamp body eases toward tilting against the swing, then catches up
+      sway += (-spin * 0.15 - sway) * Math.min(1, dt * 8);
+      draw();
+      if (Math.abs(angle) < 0.001 && Math.abs(spin) < 0.005 && Math.abs(sway) < 0.001) {
+        angle = spin = sway = 0;
+        draw();
         running = false;
       } else {
         requestAnimationFrame(step);
@@ -361,7 +652,7 @@
       // a tap has no movement, so nudge it away from the side it was touched on
       const shove = e.movementX || (e.clientX < box.left + box.width / 2 ? 6 : -6);
       // positive rotation swings the bottom left, so a push to the right is negative
-      spin = Math.max(-MAX_SPIN, Math.min(MAX_SPIN, spin - shove * 0.08));
+      spin = Math.max(-MAX_SPIN, Math.min(MAX_SPIN, spin - shove * 0.03));
       if (!running) {
         running = true;
         last = performance.now();
@@ -369,8 +660,10 @@
       }
     }
 
-    lamp.addEventListener("pointerenter", push);
-    lamp.addEventListener("pointermove", push);
+    for (const part of [lamp, cord]) {
+      part.addEventListener("pointerenter", push);
+      part.addEventListener("pointermove", push);
+    }
   </script>
 </body>
 </html>
