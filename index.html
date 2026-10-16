@@ -90,7 +90,8 @@
 
     body.dark .print { background: #1a0705; box-shadow: 0 0 60px rgba(255, 40, 20, 0.18); }
     body.dark .print img { animation: develop 5s ease-out 0.8s forwards; }
-    body.dark .print::after { opacity: 0.35; }
+    /* red cast while developing, then lifts to show the true black and white */
+    body.dark .print::after { animation: safelight-cast 9s ease forwards; }
 
     .hint { margin: 0; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; }
     .hint .on { display: none; }
@@ -139,8 +140,16 @@
       60%  { opacity: 1; }
     }
 
+    @keyframes safelight-cast {
+      0%   { opacity: 0; }
+      15%  { opacity: 0.35; }
+      65%  { opacity: 0.35; }
+      100% { opacity: 0; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       body.dark::before { animation: none; }
+      body.dark .print::after { animation: none; }
       body.dark .print img { animation-duration: 0.01s; animation-delay: 0s; }
     }
   </style>
