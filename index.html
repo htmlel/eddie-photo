@@ -7,7 +7,6 @@
   <meta name="color-scheme" content="light" />
   <title>Eddie's Darkroom</title>
   <link rel="icon" href="images/favicon-64x64.png" />
-  <link rel="preload" as="image" href="images/darkmode_switch.png" />
   <style>
     * { box-sizing: border-box; }
 
@@ -44,29 +43,97 @@
       align-items: center;
       justify-content: center;
       gap: 24px;
-      padding: 24px 16px 140px;
+      padding: 96px 16px 140px;
     }
 
-    header {
-      text-align: center;
-      font-size: 12px;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
+    /* the safelight: hangs from the ceiling, unlit until the switch flips */
+    .safelight {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 64px;
+      height: 88px;
+      pointer-events: none;
     }
 
-    h1 { margin: 0 0 6px; font-size: 14px; font-weight: 400; }
-    header p { margin: 0; opacity: 0.55; }
+    /* only the drawn lamp catches the mouse, not the empty box around it */
+    .safelight .lamp > :not(.halo) { pointer-events: auto; }
+    .safelight .lamp { transform-box: view-box; transform-origin: 40px 0; }
+    .safelight .cord { stroke: #3a3a3a; stroke-width: 1.5; }
+    .safelight .shade { fill: #2b2b2b; transition: stroke 1s; }
+    .safelight .bulb { fill: #6e4440; transition: fill 0.6s; }
+    .safelight .halo { opacity: 0; transition: opacity 1.2s; }
+
+    body.dark .safelight .shade { stroke: rgba(255, 60, 40, 0.35); stroke-width: 1; }
+    body.dark .safelight .bulb { fill: #ff3a22; animation: flicker 1.2s steps(1); }
+    body.dark .safelight .halo { opacity: 1; animation: flicker 1.2s steps(1); }
+
+    /* the developing tray on the table */
+    .tray {
+      --rim: 22px;
+      --edge: 16px;
+      padding: var(--rim);
+      border-radius: 14px;
+      background: linear-gradient(#d8d2c2, #c8c1ad);
+      box-shadow: 0 20px 30px -14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+      transition: background 0.8s, box-shadow 0.8s;
+    }
+
+    /* the tray's fixed inner walls; the liquid moves inside them */
+    .bath { position: relative; overflow: hidden; border-radius: 6px; }
+    .bath::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+      pointer-events: none;
+    }
+
+    /* the liquid: everything in here wobbles through the #water filter.
+       It overhangs the walls by 10px so the filter's ragged edges stay hidden */
+    .water {
+      position: relative;
+      margin: -10px;
+      padding: calc(var(--edge) + 10px);
+      background: #bdb6a1;
+      filter: url(#water);
+      transition: background-color 0.8s;
+    }
+
+    /* reflection on the surface: the room light, then the safelight */
+    .sheen {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      background: radial-gradient(ellipse 38% 16% at 28% 14%, rgba(255, 255, 255, 0.5), transparent 70%);
+      animation: drift 9s ease-in-out infinite alternate;
+    }
+
+    body.dark .tray {
+      background: linear-gradient(#1d1716, #110c0c);
+      box-shadow: 0 20px 30px -14px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 70, 50, 0.2), 0 0 60px rgba(255, 40, 20, 0.12);
+    }
+    body.dark .water { background: #150707; }
+    body.dark .sheen {
+      background:
+        radial-gradient(ellipse 14% 9% at 50% 9%, rgba(255, 70, 40, 0.6), transparent 70%),
+        radial-gradient(ellipse 55% 30% at 50% 8%, rgba(255, 40, 20, 0.14), transparent 70%);
+      animation: drift 9s ease-in-out infinite alternate, flicker 1.2s steps(1);
+    }
 
     /* the print: blank paper in the light, a photo once it develops */
     .print {
       position: relative;
-      width: min(90vw, 700px, calc((100vh - 300px) * 1.4));
+      width: min(calc(90vw - 76px), 620px, calc((100vh - 370px) * 1.4));
       aspect-ratio: 5704 / 4073;
       background: #fff;
       border-radius: 2px;
-      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
       overflow: hidden;
-      transition: background-color 1s, box-shadow 1s;
+      transition: background-color 1s;
     }
 
     .print img {
@@ -88,31 +155,77 @@
       pointer-events: none;
     }
 
-    body.dark .print { background: #1a0705; box-shadow: 0 0 60px rgba(255, 40, 20, 0.18); }
+    /* the sheet slides in from the left and settles flat into the liquid */
+    body.dark .print { background: #1a0705; animation: dip 0.6s cubic-bezier(0.2, 0.7, 0.3, 1); }
     body.dark .print img { animation: develop 5s ease-out 0.8s forwards; }
     /* red cast while developing, then lifts to show the true black and white */
     body.dark .print::after { animation: safelight-cast 9s ease forwards; }
 
     .hint { margin: 0; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; }
-    .hint .on { display: none; }
-    body.dark .hint .off { display: none; }
-    body.dark .hint .on { display: inline; }
+    body.dark .hint { visibility: hidden; }
+
+    @keyframes dip {
+      from { transform: translate(-14px, -8px) rotate(-1.5deg) scale(1.03); box-shadow: 0 14px 22px rgba(0, 0, 0, 0.45); }
+    }
 
     .switch {
       position: fixed;
       left: 30px;
       top: 50%;
       transform: translateY(-50%);
-      width: 80px;
-      height: 140px;
+      width: 64px;
+      height: 108px;
       padding: 0;
       border: 0;
       background: none;
+      font: inherit;
       cursor: pointer;
+      perspective: 260px;
     }
 
-    .switch:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; border-radius: 8px; }
-    .switch img { width: 100%; height: 100%; object-fit: contain; }
+    .switch:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; border-radius: 14px; }
+
+    .plate {
+      display: flex;
+      height: 100%;
+      padding: 16px 13px;
+      border-radius: 12px;
+      background: linear-gradient(160deg, #f3efe4, #d6d0bf);
+      box-shadow: 0 6px 14px -4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+      transition: background 0.6s, box-shadow 0.6s;
+    }
+
+    /* the rocker tilts toward whichever half is pressed in */
+    .rocker {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      border-radius: 6px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: #9a9380;
+      background: linear-gradient(#d9d2bf, #f8f5ec 55%, #ece6d7);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 3px 3px rgba(0, 0, 0, 0.18);
+      transform: rotateX(14deg);
+      transition: transform 0.22s cubic-bezier(0.3, 1.5, 0.5, 1), background 0.6s, box-shadow 0.6s;
+    }
+
+    .rocker span { transition: color 0.4s, text-shadow 0.4s; }
+    .rocker .on { color: #4a4436; }
+
+    body.dark .plate {
+      background: linear-gradient(160deg, #262321, #121110);
+      box-shadow: 0 6px 14px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(255, 60, 40, 0.15);
+    }
+    body.dark .rocker {
+      transform: rotateX(-14deg);
+      background: linear-gradient(#302c29, #1f1d1b 45%, #141312);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 -3px 3px rgba(0, 0, 0, 0.5);
+    }
+    body.dark .rocker .on { color: #4a4542; }
+    body.dark .rocker .off { color: #ff3a22; text-shadow: 0 0 6px rgba(255, 58, 34, 0.8); }
 
     @media (max-width: 768px) {
       .switch {
@@ -120,9 +233,12 @@
         top: auto;
         bottom: 20px;
         transform: translateX(-50%);
-        width: 60px;
-        height: 105px;
+        width: 52px;
+        height: 88px;
       }
+      .plate { padding: 12px 10px; }
+      .tray { --rim: 12px; --edge: 8px; }
+      .print { width: min(calc(90vw - 40px), 620px, calc((100vh - 330px) * 1.4)); }
     }
 
     @keyframes develop {
@@ -140,6 +256,10 @@
       60%  { opacity: 1; }
     }
 
+    @keyframes drift {
+      to { transform: translate(3%, 2%) scale(1.05); }
+    }
+
     @keyframes safelight-cast {
       0%   { opacity: 0; }
       15%  { opacity: 0.35; }
@@ -148,37 +268,109 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      body.dark::before { animation: none; }
-      body.dark .print::after { animation: none; }
+      body.dark::before, body.dark .safelight * { animation: none; }
+      body.dark .print::after, .sheen, body.dark .sheen { animation: none; }
       body.dark .print img { animation-duration: 0.01s; animation-delay: 0s; }
+      body.dark .print { animation: none; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <header>
-      <h1>Eddie Cisneros</h1>
-      <p>Photographs</p>
-    </header>
+  <!-- the liquid: slow-moving noise that bends whatever is under it -->
+  <svg id="water-defs" width="0" height="0" style="position: absolute" aria-hidden="true">
+    <filter id="water" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.007 0.011" numOctaves="1" seed="7" result="noise">
+        <animate attributeName="baseFrequency" dur="14s" values="0.007 0.011;0.009 0.013;0.007 0.011" repeatCount="indefinite" />
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
 
-    <div class="print">
-      <img src="images/photo-01.jpg" alt="A woman rests her hand on the shoulder of an elderly woman who covers her face, in black and white" />
+  <svg class="safelight" viewBox="0 0 80 110" overflow="visible" aria-hidden="true">
+    <defs>
+      <radialGradient id="halo">
+        <stop offset="0" stop-color="#ff3a22" stop-opacity="0.8" />
+        <stop offset="1" stop-color="#ff3a22" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+    <g class="lamp" id="lamp">
+      <!-- light only spills out below the shade's rim -->
+      <clipPath id="below-shade"><rect x="-60" y="71" width="200" height="60" /></clipPath>
+      <ellipse class="halo" cx="40" cy="76" rx="32" ry="30" fill="url(#halo)" clip-path="url(#below-shade)" />
+      <line class="cord" x1="40" y1="0" x2="40" y2="46" />
+      <rect class="shade" x="35" y="44" width="10" height="9" rx="2" />
+      <ellipse class="bulb" cx="40" cy="74" rx="10" ry="9" />
+      <path class="shade" d="M22 72 L33 52 H47 L58 72 Z" />
+    </g>
+  </svg>
+
+  <main>
+    <div class="tray">
+      <div class="bath">
+        <div class="water">
+          <div class="print">
+            <img src="images/photo-01.jpg" alt="A woman rests her hand on the shoulder of an elderly woman who covers her face, in black and white" />
+          </div>
+          <div class="sheen"></div>
+        </div>
+      </div>
     </div>
 
-    <p class="hint"><span class="off">Turn off the lights</span><span class="on">No. 01</span></p>
+    <p class="hint">Turn off the lights</p>
   </main>
 
   <button class="switch" id="switch" aria-label="Darkroom light" aria-pressed="false">
-    <img src="images/lightmode_switch.png" alt="" />
+    <span class="plate" aria-hidden="true">
+      <span class="rocker"><span class="on">ON</span><span class="off">OFF</span></span>
+    </span>
   </button>
 
   <script>
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    if (calm.matches) document.getElementById("water-defs").pauseAnimations();
+
     const lightSwitch = document.getElementById("switch");
     lightSwitch.addEventListener("click", () => {
       const dark = document.body.classList.toggle("dark");
       lightSwitch.setAttribute("aria-pressed", dark);
-      lightSwitch.querySelector("img").src = dark ? "images/darkmode_switch.png" : "images/lightmode_switch.png";
     });
+
+    // the lamp is a damped pendulum: the pointer pushes it, gravity and friction bring it home
+    const lamp = document.getElementById("lamp");
+    const GRAVITY = 22, FRICTION = 1.8, MAX_SPIN = 2;
+    let angle = 0, spin = 0, last = 0, running = false;
+
+    function step(now) {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      spin += (-GRAVITY * Math.sin(angle) - FRICTION * spin) * dt;
+      angle += spin * dt;
+      lamp.style.transform = `rotate(${angle}rad)`;
+      if (Math.abs(angle) < 0.001 && Math.abs(spin) < 0.005) {
+        angle = spin = 0;
+        lamp.style.transform = "";
+        running = false;
+      } else {
+        requestAnimationFrame(step);
+      }
+    }
+
+    function push(e) {
+      if (calm.matches) return;
+      const box = lamp.getBoundingClientRect();
+      // a tap has no movement, so nudge it away from the side it was touched on
+      const shove = e.movementX || (e.clientX < box.left + box.width / 2 ? 6 : -6);
+      // positive rotation swings the bottom left, so a push to the right is negative
+      spin = Math.max(-MAX_SPIN, Math.min(MAX_SPIN, spin - shove * 0.08));
+      if (!running) {
+        running = true;
+        last = performance.now();
+        requestAnimationFrame(step);
+      }
+    }
+
+    lamp.addEventListener("pointerenter", push);
+    lamp.addEventListener("pointermove", push);
   </script>
 </body>
 </html>
