@@ -2,127 +2,174 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- stops Chrome's forced dark mode from pre-darkening the light room -->
+  <meta name="color-scheme" content="light" />
   <title>Eddie's Darkroom</title>
+  <link rel="icon" href="images/favicon-64x64.png" />
+  <link rel="preload" as="image" href="images/darkmode_switch.png" />
   <style>
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; margin: 0; }
+
     body {
-      margin: 0;
       background: #e5e1d3;
-      color: black;
-      font-family: sans-serif;
+      color: #1a1a1a;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
       overflow: hidden;
+      transition: background-color 0.6s ease, color 0.6s ease;
     }
 
-    .landing {
-      width: 100vw;
-      height: 100vh;
-      background: #e5e1d3;
+    /* the safelight: a red glow hanging above the page */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255, 40, 20, 0.35), transparent 70%),
+        radial-gradient(ellipse 120% 70% at 50% 100%, rgba(120, 0, 0, 0.25), transparent 70%);
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    body.dark { background: #0b0b0b; color: #c8301f; }
+    body.dark::before { opacity: 1; animation: flicker 1.2s steps(1); }
+
+    main {
+      height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding-top: 40px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
+      justify-content: center;
+      gap: 24px;
+      padding: 24px 16px 140px;
     }
 
-    .placeholder-image {
-      width: 90vw;
-      max-width: 700px;
-      aspect-ratio: 3/2;
-      background-color: #ffffff;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    header {
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
     }
 
-    .light-switch {
-      position: fixed;
-      width: 80px;
-      height: 140px;
-      cursor: pointer;
-      z-index: 10;
+    h1 { margin: 0 0 6px; font-size: 14px; font-weight: 400; }
+    header p { margin: 0; opacity: 0.55; }
+
+    /* the print: blank paper in the light, a photo once it develops */
+    .print {
+      position: relative;
+      width: min(90vw, 700px, calc((100vh - 300px) * 1.4));
+      aspect-ratio: 5704 / 4073;
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      transition: background-color 1s, box-shadow 1s;
     }
 
-    @media (max-width: 768px) {
-      .light-switch {
-        left: 50%;
-        top: 65%;
-        transform: translate(-50%, -50%);
-      }
-    }
-
-    @media (min-width: 769px) {
-      .light-switch {
-        left: 30px;
-        top: 50%;
-        transform: translateY(-50%);
-      }
-    }
-
-    .light-switch img {
+    .print img {
+      display: block;
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
+      opacity: 0;
     }
 
-    .darkroom {
-      display: none;
+    .print::after {
+      content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #0b0b0b;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 40px;
+      inset: 0;
+      background: #ff2a1a;
+      mix-blend-mode: multiply;
+      opacity: 0;
+      transition: opacity 1.2s;
+      pointer-events: none;
     }
 
-    .darkroom-image {
-      max-width: 90vw;
-      max-height: 60vh;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+    body.dark .print { background: #1a0705; box-shadow: 0 0 60px rgba(255, 40, 20, 0.18); }
+    body.dark .print img { animation: develop 5s ease-out 0.8s forwards; }
+    body.dark .print::after { opacity: 0.35; }
+
+    .hint { margin: 0; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; }
+    .hint .on { display: none; }
+    body.dark .hint .off { display: none; }
+    body.dark .hint .on { display: inline; }
+
+    .switch {
+      position: fixed;
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 80px;
+      height: 140px;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
     }
-  </style>
-  <script>
-    function enterDarkroom() {
-      const switchImg = document.getElementById("switchImg");
-      const landing = document.getElementById("landing");
-      const darkroom = document.querySelector(".darkroom");
 
-      const isDark = darkroom.style.display === "flex";
+    .switch:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; border-radius: 8px; }
+    .switch img { width: 100%; height: 100%; object-fit: contain; }
 
-      if (isDark) {
-        switchImg.src = "images/lightmode_switch.png";
-        landing.style.display = "flex";
-        darkroom.style.display = "none";
-        document.body.style.backgroundColor = "#e5e1d3";
-      } else {
-        switchImg.src = "images/darkmode_switch.png";
-        landing.style.display = "none";
-        darkroom.style.display = "flex";
-        document.body.style.backgroundColor = "#0b0b0b";
+    @media (max-width: 768px) {
+      .switch {
+        left: 50%;
+        top: auto;
+        bottom: 20px;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 105px;
       }
     }
-  </script>
+
+    @keyframes develop {
+      0%   { opacity: 0; filter: brightness(2.5) contrast(0.3); }
+      30%  { opacity: 0.5; }
+      100% { opacity: 1; filter: none; }
+    }
+
+    @keyframes flicker {
+      0%   { opacity: 0; }
+      10%  { opacity: 0.8; }
+      20%  { opacity: 0.1; }
+      35%  { opacity: 1; }
+      45%  { opacity: 0.4; }
+      60%  { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.dark::before { animation: none; }
+      body.dark .print img { animation-duration: 0.01s; animation-delay: 0s; }
+    }
+  </style>
 </head>
 <body>
-  <div class="light-switch" onclick="enterDarkroom()">
-    <img id="switchImg" src="images/lightmode_switch.png" alt="Switch" />
-  </div>
+  <main>
+    <header>
+      <h1>Eddie Cisneros</h1>
+      <p>Photographs</p>
+    </header>
 
-  <div class="landing" id="landing">
-    <div class="placeholder-image"></div>
-  </div>
+    <div class="print">
+      <img src="images/photo-01.jpg" alt="A woman rests her hand on the shoulder of an elderly woman who covers her face, in black and white" />
+    </div>
 
-  <div class="darkroom">
-    <img src="images/image-1.jpeg" class="darkroom-image" alt="Emotional photo">
-  </div>
+    <p class="hint"><span class="off">Turn off the lights</span><span class="on">No. 01</span></p>
+  </main>
+
+  <button class="switch" id="switch" aria-label="Darkroom light" aria-pressed="false">
+    <img src="images/lightmode_switch.png" alt="" />
+  </button>
+
+  <script>
+    const lightSwitch = document.getElementById("switch");
+    lightSwitch.addEventListener("click", () => {
+      const dark = document.body.classList.toggle("dark");
+      lightSwitch.setAttribute("aria-pressed", dark);
+      lightSwitch.querySelector("img").src = dark ? "images/darkmode_switch.png" : "images/lightmode_switch.png";
+    });
+  </script>
 </body>
 </html>
